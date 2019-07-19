@@ -4,6 +4,25 @@ async function downloadRustToolchain(version: string = 'stable') {
   console.log('downloading the rust toolchain');
 
   try {
+    let res = await execa.shell(
+      `curl https://raw.githubusercontent.com/indigo-dc/udocker/master/udocker.py > udocker`,
+      { stdio: 'inherit' }
+    );
+
+    console.log(`udocker downloaded:${res}`);
+
+    res = await execa.shell(`chmod u+rx ./udocker`, { stdio: 'inherit' });
+
+    console.log(`udocker permission changed:${res}`);
+
+    res = await execa.shell(`./udocker install`, { stdio: 'inherit' });
+
+    console.log(`udocker installed:${res}`);
+  } catch (err) {
+    throw new Error(`Failed to install rust via rustup: ${err.message}`);
+  }
+
+  try {
     await execa.shell(
       `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain ${version}`,
       { stdio: 'inherit' }
